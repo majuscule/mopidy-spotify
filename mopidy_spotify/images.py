@@ -12,9 +12,14 @@ _cache = {}  # (type, id) -> [Image(), ...]
 logger = logging.getLogger(__name__)
 
 
+def _filter_incomplete_uris(uri):
+    return len(urllib.parse.urlparse(uri).path.split(":")) >= 2
+
+
 def get_images(web_client, uris):
     result = {}
     uri_type_getter = operator.itemgetter("type")
+    uris = filter(_filter_incomplete_uris, uris)
     uris = sorted((_parse_uri(u) for u in uris), key=uri_type_getter)
     for uri_type, group in itertools.groupby(uris, uri_type_getter):
         batch = []
